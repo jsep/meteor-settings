@@ -16,7 +16,7 @@ Package.onUse(function (api) {
   api.use("meteor");
   api.use('ecmascript');
 
-  api.mainModule('Settings.js');
+  api.mainModule('index.js');
 });
 
 
