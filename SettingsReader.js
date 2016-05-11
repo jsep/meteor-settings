@@ -2,16 +2,7 @@
 class SettingsReader {
 
   constructor(settings){
-    let self = this;
-
-    let Settings = (key, defaultValue)=>{
-      return self.get(key, defaultValue);
-    };
-
-    Settings.get = self.get.bind(self);
-    Settings.add = self.add.bind(self);
-    Settings.required = self.required.bind(self);
-    return Settings;
+    this.settings = settings;
   }
 
   get(key, defaultValue){
@@ -26,6 +17,29 @@ class SettingsReader {
 
   }
 
+  static makeReader(settings = {}){
+    let settingsReader = new SettingsReader(settings);
+
+    let reader = (key, defaultValue)=>{
+      return settingsReader.get(key, defaultValue);
+    };
+
+    reader.get = settingsReader.get.bind(settingsReader);
+    reader.add = settingsReader.add.bind(settingsReader);
+    reader.required = settingsReader.required.bind(settingsReader);
+    return reader;
+  }
+
+  static makeRequiredSettingsReader(reader){
+    let requiredSettingsReader = (key)=>{
+      return reader.required(key)
+    };
+
+    requiredSettingsReader.get = (key)=> {
+      return requiredSettingsReader(key);
+    };
+    return requiredSettingsReader
+  }
 }
 
 export { SettingsReader };

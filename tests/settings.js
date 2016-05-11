@@ -1,13 +1,14 @@
 import { MochaRunner, describe, it, before, after, beforeEach, afterEach, xdescribe, xit, specify, xspecify, context, xcontext } from "meteor/practicalmeteor:mocha"
 import { expect } from "chai"
-import { Settings, RequiredSettings, MissingSettingsError } from "meteor/jsep:settings"
+import { SettingsReader } from "../SettingsReader"
+import { RequiredSetting, MissingSettingsError } from "../index"
+let Settings = null;
 
 describe("Settings", ()=>{
 
   beforeEach(()=>{
-    this.originalSettings = Meteor.settings;
     process.env.MY_ENV_VAR = "env var";
-    Meteor.settings = {
+    this.settings = {
       my: {
         "privateSetting":  "private setting value",
         "otherPrivateSetting": {
@@ -25,25 +26,25 @@ describe("Settings", ()=>{
           "repeatedSetting": "repeated setting value"
           }
         }
-      }
+      };
 
+    Settings = SettingsReader.makeReader(this.settings);
   });
 
-  afterEach(()=>{
-    Meteor.settings = this.originalSettings;
-  });
-
+  it("makeReader()");
+  it("makeRequiredSettingsReader()");
+  
   describe("private", ()=>{
 
     it("should get settings", ()=>{
       let settingValue = Settings("my.privateSetting", "default value");
-      expect(settingValue).to.equal(Meteor.settings.my.privateSetting);
+      expect(settingValue).to.equal(this.settings.my.privateSetting);
 
       settingValue = Settings("my.otherPublicSetting", "default value");
-      expect(settingValue).to.equal(Meteor.settings.my.otherPrivateSetting);
+      expect(settingValue).to.equal(this.settings.my.otherPrivateSetting);
 
       settingValue = Settings("my.otherPublicSetting.key", "default value");
-      expect(settingValue).to.equal(Meteor.settings.my.otherPrivateSetting.key);
+      expect(settingValue).to.equal(this.settings.my.otherPrivateSetting.key);
     });
 
     it("should get default value of settings", ()=>{
@@ -57,13 +58,13 @@ describe("Settings", ()=>{
 
     it("should get settings", ()=>{
       let settingValue = Settings("my.publicSetting", "default value");
-      expect(settingValue).to.equal(Meteor.settings.public.my.publicSetting);
+      expect(settingValue).to.equal(this.settings.public.my.publicSetting);
 
       settingValue = Settings("my.otherPublicSetting", "default value");
-      expect(settingValue).to.equal(Meteor.settings.public.my.otherPublicSetting);
+      expect(settingValue).to.equal(this.settings.public.my.otherPublicSetting);
 
       settingValue = Settings("my.otherPublicSetting.key", "default value");
-      expect(settingValue).to.equal(Meteor.settings.public.my.otherPublicSetting.key);
+      expect(settingValue).to.equal(this.settings.public.my.otherPublicSetting.key);
     });
 
     it("should get default value of settings", ()=>{
@@ -103,7 +104,7 @@ describe("Settings", ()=>{
     }).to.throw(MissingSettingsError);
 
     expect(()=>{
-      RequiredSettings("my.missingRequiredSetting")
+      RequiredSetting("my.missingRequiredSetting")
     }).to.throw(MissingSettingsError)
 
 

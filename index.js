@@ -1,13 +1,11 @@
 import { MissingSettingsError } from "./MissingSettingsError"
 import { SettingsReader } from "./SettingsReader";
 
-let Settings = new SettingsReader(Meteor.settings || {});
-
-let RequiredSettings = (key)=>{
-  return Settings.required(key)
-};
+let Settings = SettingsReader.makeReader(Meteor.settings);
+let RequiredSetting = SettingsReader.makeRequiredSettingsReader(Settings);
 
 export default Settings;
 export { Settings };
-export { RequiredSettings };
+export { SettingsReader };
+export { RequiredSetting };
 export { MissingSettingsError };
